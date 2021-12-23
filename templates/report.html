@@ -69,64 +69,9 @@
     </table>
 <br>
 <br>
-
 <br>
-<img style="display: block; margin: 0 auto;" src="{{ url_for('static', filename=img_root) }}">
-
-<script>
-const ctx = document.getElementById('myChart').getContext('2d');
-const myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ['L', 'F', 'K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-        datasets: [{
-            label: '',
-            data: [{{TB_L}},
-            {{TB_F}},
-            {{TB_K}},
-            {{TB_1}},
-            {{TB_2}},
-            {{TB_3}},
-            {{TB_4}},
-            {{TB_5}},
-            {{TB_6}},
-            {{TB_7}},
-            {{TB_8}},
-            {{TB_9}},
-            {{TB_0}}],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-</script>
+<img style="display: block; margin: 0 auto; width: 100%" src="{{ url_for('static', filename=img_root) }}">
+{% if email_user in email_code %}
 <h3>
     Код по Уэлшу: {{code_welsh}}
     <br>
@@ -146,8 +91,9 @@ const myChart = new Chart(ctx, {
     {% endfor %}
 </h4>
 <br><br>
-<h3>Тип профиля: {{type_profile}}</h3>
-<h4>{{type_profile_info}}</h4>
+<h3>Тип профиля: {%for i in type_profile %} {{i}} {% endfor %}</h3>
+<h4>{%for i in type_profile_info %} {{i}}<br> {% endfor %}
+</h4>
 <h3 style="text-align: center; font-weight: 900;">Анализ шкал L, F, K.</h3>
 <h3>Анализ шкалы L.</h3>
 <h4>{{L_Discribe}}</h4>
@@ -172,6 +118,9 @@ const myChart = new Chart(ctx, {
 </h4>
 {% endif %}
 <br><br>
+{%if scale_comb%}
+<h3>Взаимоисключающие шкалы: {{scale_comb}}</h3>
+{%endif%}
 <h3>Общее время прохождения теста: {{time_test}}</h3>
 <h3>Среднее время, потраченное на каждый вопрос: {{middle_time_test}}</h3>
 <h3>Минимальное время, затраченное на получение ответа: {{min_time_test}}</h3>
@@ -179,6 +128,6 @@ const myChart = new Chart(ctx, {
 <h3>Количество исправлений: {{attemps}}</h3>
 <h3>Номера вопросов с исправлениями: {{quiz_attemps}}</h3>
 <img style="display: block; margin: 0 auto;" src="{{ url_for('static', filename=img_root_time) }}">
-
+{% endif %}
 </body>
 </html>

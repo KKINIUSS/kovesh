@@ -43,6 +43,7 @@ type_profile_float = """• Большинство шкал (5 или более
 • Можно сказать, что «все плохо» - плохая психологическая и социальная адаптация, крайне тяжелое эмоциональное состояние. Нарушены межличностные контакты, когнитивная и эмоциональная дезорганизация; исчерпаны адаптационные ресурсы."""
 type_profile_upper = """• Все шкалы более 50 Тб"""
 type_profile_upl = """ • Разброс между минимумом и максимумом до 21 Тб"""
+email_code = "kisell22@yandex.ru"
 app = Flask(__name__)
 
 
@@ -142,8 +143,6 @@ def pdf_generation(testId):
     attemps_querry = cur.fetchall()
     attemps = sum([int(i[1]) - 1 for i in attemps_querry])
     quiz_attemps = ' '.join([i[0] for i in attemps_querry])
-    print(quiz_attemps)
-    print(attemps)
     data_values = list(data[3::2])
     data_values = list(filter(None, data_values))
     data_values = list(map(int, data_values))
@@ -158,8 +157,10 @@ def pdf_generation(testId):
     id_user = data[1]
     date_test = data[2]
     data = list(data[3::2])
-    cur.execute(f"select gender from users where id='{id_user}'")
-    gender = cur.fetchone()[0]
+    cur.execute(f"select gender, email from users where id='{id_user}'")
+    data_user = cur.fetchone()
+    gender = data_user[0]
+    email_user = data_user[1]
     Data_L = concat(Index_L, data)
     Data_F_y = concat(Index_F_y, data)
     Data_F_n = concat(Index_F_n, data)
@@ -287,21 +288,22 @@ def pdf_generation(testId):
         gender = "Ж"
     labels = ["L", "F", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
     values = [TB_L, TB_F, TB_K, TB_1, TB_2, TB_3, TB_4, TB_5, TB_6, TB_7, TB_8, TB_9, TB_0]
-    plt.plot(labels, values, lw=3, color="blue", alpha=0.5)
+    plt.plot(labels[:3], values[:3], lw=3, color="blue", alpha=0.5)
+    plt.plot(labels[3:], values[3:], lw=3, color="blue", alpha=0.5)
     plt.scatter(labels, values, color='blue', s=10)
-    plt.annotate(TB_L, xy=("L", TB_L + 3))
-    plt.annotate(TB_F, xy=("F", TB_F + 3))
-    plt.annotate(TB_K, xy=("K", TB_K + 3))
-    plt.annotate(TB_1, xy=("1", TB_1 + 3))
-    plt.annotate(TB_2, xy=("2", TB_2 + 3))
-    plt.annotate(TB_3, xy=("3", TB_3 + 3))
-    plt.annotate(TB_4, xy=("4", TB_4 + 3))
-    plt.annotate(TB_5, xy=("5", TB_5 + 3))
-    plt.annotate(TB_6, xy=("6", TB_6 + 3))
-    plt.annotate(TB_7, xy=("7", TB_7 + 3))
-    plt.annotate(TB_8, xy=("8", TB_8 + 3))
-    plt.annotate(TB_9, xy=("9", TB_9 + 3))
-    plt.annotate(TB_0, xy=("0", TB_0 + 3))
+    plt.annotate(TB_L, xy=("L", TB_L + 1))
+    plt.annotate(TB_F, xy=("F", TB_F + 1))
+    plt.annotate(TB_K, xy=("K", TB_K + 1))
+    plt.annotate(TB_1, xy=("1", TB_1 + 1))
+    plt.annotate(TB_2, xy=("2", TB_2 + 1))
+    plt.annotate(TB_3, xy=("3", TB_3 + 1))
+    plt.annotate(TB_4, xy=("4", TB_4 + 1))
+    plt.annotate(TB_5, xy=("5", TB_5 + 1))
+    plt.annotate(TB_6, xy=("6", TB_6 + 1))
+    plt.annotate(TB_7, xy=("7", TB_7 + 1))
+    plt.annotate(TB_8, xy=("8", TB_8 + 1))
+    plt.annotate(TB_9, xy=("9", TB_9 + 1))
+    plt.annotate(TB_0, xy=("0", TB_0 + 1))
     plt.savefig(os.path.abspath(os.getcwd()) + f"/static/{id_user}_{testId}.png")
     plt.close()
     plt.plot(data_values, data_time, lw=2, color="blue", alpha=0.5)
@@ -317,8 +319,8 @@ def pdf_generation(testId):
     index_welsh = SB_F - SB_K
     rating_veracity = str()
     androgyny = str()
-    type_profile = str()
-    type_profile_info = str()
+    type_profile = []
+    type_profile_info = []
     profile_tilt = str()
     if gender == "М":
         if index_welsh >= -18 and index_welsh <= 4:
@@ -472,8 +474,8 @@ def pdf_generation(testId):
         elif (i < 50):
             an += 1
     if (an >= 5):
-        type_profile = "Утопленный"
-        type_profile_info = type_profile_utop
+        type_profile += ["Утопленный;"]
+        type_profile_info += [type_profile_utop]
     an = 0
     for i in analytics:
         if (i >= 45 and i < 65):
@@ -482,43 +484,43 @@ def pdf_generation(testId):
             an = 0
             break
     if (an == 13):
-        type_profile = "Нормативный"
-        type_profile_info = type_profile_normat
+        type_profile += ["Нормативный;"]
+        type_profile_info += [type_profile_normat]
     an = 0
     for i in analytics:
         if (i >= 65 and i < 70):
-            type_profile = "Квазинормативный"
-            type_profile_info = type_profile_kvazi
+            type_profile += ["Квазинормативный;"]
+            type_profile_info += [type_profile_kvazi]
             break
     for i in analytics:
         if (i >= 70 and i < 75):
-            type_profile = "Пограничный"
-            type_profile_info = type_profile_pogran
+            type_profile += ["Пограничный;"]
+            type_profile_info = [type_profile_pogran]
             break
     for i in analytics:
         if (i >= 75 and i < 80):
             an += 1
     if (an > 0 and an < 4):
-        type_profile = "Высокодиапазонный"
-        type_profile_info = type_profile_diapazon
+        type_profile += ["Высокодиапазонный;"]
+        type_profile_info += [type_profile_diapazon]
     an = 0
     for i in analytics:
         if (i > 70):
             an += 1
     if (an >= 5):
-        type_profile = "Плавающий"
-        type_profile_info = type_profile_float
+        type_profile += ["Плавающий;"]
+        type_profile_info += type_profile_float
     an = 0
     for i in analytics:
         if (i > 50):
             an += 1
     if (an == 13):
-        type_profile = "Приподнятый"
-        type_profile_info = type_profile_upper
+        type_profile += ["Приподнятый;"]
+        type_profile_info += [type_profile_upper]
     an = 0
     if (max(analytics) - min(analytics) < 21):
-        type_profile = "Уплощенный"
-        type_profile_info = type_profile_upl
+        type_profile += ["Уплощенный;"]
+        type_profile_info += [type_profile_upl]
     analytics_notes = [TB_F, TB_L, TB_K]
     analytics_clinic = [TB_1, TB_2, TB_3, TB_4, TB_5, TB_6, TB_7, TB_8, TB_9, TB_0]
     for i in analytics_clinic:
@@ -555,8 +557,6 @@ def pdf_generation(testId):
     if len(rating_profile) == 1:
         rating_profile = ["Профиль не имеет признаков ограничений для исследования."]
     else:
-        razdel_3 = False
-        razdel_4 = False
         rating_profile = [
                              "Профиль не подлежит интерпретации. Можно только рассматривать сочетания шкал L, F, K. Причины: "] + rating_profile[
                                                                                                                                   1:]
@@ -702,18 +702,15 @@ def pdf_generation(testId):
             description_line += ["""8 шкала Аутизации
                                     \nОписание - Измеряет степень выраженности шизоидных черт личности
                                     \nЗападение - Возможно: стандартность поведения, банальность мышления, общительность."""]
-        scale_comb_2 = True
-        scale_comb_1 = True
-        scale_comb_9 = True
-        scale_comb_8 = True
+        scale_comb = ""
         if (TB_2 > 70 and TB_7 > 70):
-            scale_comb_2 = False
+            scale_comb += "2"
         if (TB_3 > 70 and TB_1 > 70):
-            scale_comb_1 = False
+            scale_comb += "1"
         if (TB_4 > 70 and TB_9 > 70):
-            scale_comb_9 = False
+            scale_comb += "9"
         if (TB_6 > 70 and TB_8 > 70):
-            scale_comb_8 = False
+            scale_comb += "8"
         middle_profile = sum(analytics_clinic) / 10
         if (TB_2 > 70 and TB_9 < TB_0):
             description_scale += ["""(!) Вероятность суицидальных намерений
@@ -1028,7 +1025,8 @@ def pdf_generation(testId):
                            K_Discribe=K_Discribe, L_Discribe=L_Discribe, F_Discribe=F_Discribe,
                            description_line=description_line, description_scale=description_scale, code_welsh=code_welsh,
                            img_root=img_root, img_root_time=img_root_time, min_time_test=min_time_test, max_time_test=max_time_test,
-                           time_test=time_test, middle_time_test=middle_time_test, attemps=attemps, quiz_attemps=quiz_attemps)
+                           time_test=time_test, middle_time_test=middle_time_test, attemps=attemps, quiz_attemps=quiz_attemps, email_user=email_user,
+                           email_code=email_code, scale_comb=scale_comb)
 
 
 @app.route('/', methods=['POST', 'GET'])
