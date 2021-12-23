@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<!--Подключаем библиотеку-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+</head>
+<body>
+	<script>
+  	function registerUser() {
+    $.ajax(console.log("111") , {
+        url: '/api/v1/user/add',
+        type: 'POST',
+        dataType: 'json',
+        accept: 'application/json',
+        contentType: "application/json",
+        data :
+            JSON.stringify({
+                "deleted": false,
+                "name": "Киселев Иван Анатольевич",
+                "age": 2003,
+                "email": "kisell22@yandex.ru",
+                "date": "23.12.2021",
+                "gender": "male",
+            }),
+        success: function(result) {
+			console.log("111")
+            data = result.data;
+        }
+    });
+}
+
+function registerTest(userName, userId, userAge, userEmail, userGender) {
+    $.ajax({
+        url: '/api/v1/quiz/add',
+        type: 'POST',
+        dataType: 'json',
+        contentType: "application/json",
+        data :
+            JSON.stringify({
+                "date": "23.12.2021T01:43:15",
+                "user": {
+                    "deleted": false,
+                    "id": 1,
+                    "name": "userName",
+                    "age": "userAge",
+                    "email": "userEmail",
+                    "date": "dateNow()",
+                    "gender": "userGender",
+                    "quiz": []
+                }
+            }),
+        success: function(result) {
+            data = result.data;
+            console.log(data.id);
+        }
+    });
+}
+
+function sendAsck(userName, userAge, userEmail, userGender, question, userId) {
+    $.ajax({
+        url: '/api/v1/asck/add',
+        type: 'POST',
+        dataType: 'json',
+        contentType: "application/json",
+        data :
+            JSON.stringify({
+                "questionNumber": 3,
+                "attempts": 0,
+                "result": 1,
+                "time": "45",
+                "quiz":{
+                    "id" : 1,
+                    "date": "dateNow() + 'T' + timeNow()",
+                    "user":{
+                        "id": 1,
+                        "deleted": false,
+                        "name": "userName",
+                        "age": "userAge",
+                        "email": "userEmail",
+                        "date": "dateNow()",
+                        "gender": "userGender",
+                    }
+                }
+            }),
+        success: function(result) {
+            data = result.data;
+        }
+    });
+}
+function getResultTest() {
+    $.ajax({
+        url: '/api/v1/result/public/'+ "1",
+        type: 'GET',
+        dataType: 'json',
+        accept: 'application/json',
+        contentType: "application/json",
+        data: {},
+        success: function(result) {
+            console.log(result);
+        }
+    });
+}
+	</script>
+	<input id="clickMe" type="button" value="registerUser" onclick="registerUser();" />
+	<input id="clickMe1" type="button" value="registerTest" onclick="registerTest();" />
+	<input id="clickMe2" type="button" value="sendAsck" onclick="sendAsck();" />
+	<input id="clickMe3" type="button" value="getResultTest" onclick="getResultTest();" />
+
+</body>
+</html>
